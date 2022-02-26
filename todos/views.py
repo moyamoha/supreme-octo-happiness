@@ -89,7 +89,7 @@ class AllTodos(APIView):
         else:
             todos = Todo.objects.filter(owner=user, status=params['status'])
         serializer = TodoSerializer(todos, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"count": len(todos), "data": serializer.data}, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
         user = self.request.user
