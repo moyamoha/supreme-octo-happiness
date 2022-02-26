@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
+import email
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -10,6 +9,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import ChangePasswordSerializer, TodoSerializer, UserAuthSerializer
 from .models import Todo, User
 
@@ -21,12 +21,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
-        # Add custom claims
         token['email'] = user.email
         token['name'] = user.get_full_name()
-        # ...
-
         return token
 
 
@@ -34,13 +30,24 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-class SignupApi(generics.CreateAPIView):
+class SignupApi(APIView):
     """
     End point for signing up(creating user account)
     """
-    queryset = User.objects.all()
     permission_classes = (AllowAny,)
-    serializer_class = UserAuthSerializer
+
+    def post(self, request, format=None):
+        serializer = UserAuthSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            tokenpair = MyTokenObtainPairSerializer.get_token(user)
+            data = {
+                "refresh": str(tokenpair),
+                "access": str(tokenpair.access_token)
+            }
+            print(tokenpair)
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors)
 
 
 class ChangePassword(APIView):
