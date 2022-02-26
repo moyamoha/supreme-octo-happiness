@@ -16,7 +16,7 @@ from .models import Todo, User
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
-    """End point for loging in. The user must provide password and email. A token pair including refresh token will be returned """
+    """Customized tokenpairserializer. Tokens now include email and name of user """
 
     @classmethod
     def get_token(cls, user):
@@ -27,6 +27,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
+    """End point for loging in. The user must provide password and email. A token pair including refresh token will be returned """
     serializer_class = MyTokenObtainPairSerializer
 
 
@@ -45,7 +46,6 @@ class SignupApi(APIView):
                 "refresh": str(tokenpair),
                 "access": str(tokenpair.access_token)
             }
-            print(tokenpair)
             return Response(data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors)
 
