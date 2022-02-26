@@ -2,9 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import generics
-from .models import Todo, User
 from rest_framework.permissions import AllowAny
-from .serializers import ChangePasswordSerializer, TodoSerializer, UserAuthSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import authentication_classes
@@ -12,12 +10,14 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from .serializers import ChangePasswordSerializer, TodoSerializer, UserAuthSerializer
+from .models import Todo, User
 
-# Create your views here.
 
-
-# login
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    """End point for loging in. The user must provide password and email. A token pair including refresh token will be returned """
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -35,13 +35,18 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 class SignupApi(generics.CreateAPIView):
+    """
+    End point for signing up(creating user account)
+    """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserAuthSerializer
 
 
 class ChangePassword(APIView):
-
+    """
+    endpoint view for changing password
+    """
     permission_classes = (IsAuthenticated, )
 
     def put(self, request, *args, **kwargs):
@@ -90,7 +95,7 @@ class AllTodos(APIView):
 
 class TodoDetail(APIView):
     """
-    Edit a todo object's specific todo or delete a todo
+    Edit a todo object's specific field or delete a todo
     """
     permission_classes = (IsAuthenticated,)
 

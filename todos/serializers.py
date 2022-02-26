@@ -6,6 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 
 
 class UserAuthSerializer(serializers.ModelSerializer):
+    """Serializer for signing up"""
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]

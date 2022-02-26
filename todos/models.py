@@ -1,13 +1,9 @@
-from xml.parsers.expat import model
-from django.db import models
-#from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
-
 
 class User(AbstractUser):
+    """Overriding django's default User class"""
     email = models.EmailField(max_length=255, unique=True, blank=False)
     username = models.CharField(blank=True, unique=False, max_length=50)
 
